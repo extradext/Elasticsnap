@@ -56,6 +56,7 @@ export interface FlowState {
   
   // Actions
   addNode: (node: Omit<NodeData, 'id' | 'tabs'>) => void;
+  addChildNode: (parentId: string, node: Omit<NodeData, 'id' | 'tabs' | 'parentId'>) => void; // Tap node to create child
   updateNode: (id: string, updates: Partial<NodeData>) => void;
   deleteNode: (id: string) => void;
   addConnection: (from: string, to: string) => void;
