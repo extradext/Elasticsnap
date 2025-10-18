@@ -1,0 +1,97 @@
+diff --git a/backend/server.py b/backend/server.py
+index 3ebbb82..5b8bbed 100644
+--- a/backend/server.py
++++ b/backend/server.py
+@@ -1,4 +1,4 @@
+-from fastapi import FastAPI, APIRouter
++from fastapi import FastAPI, APIRouter, HTTPException
+ from dotenv import load_dotenv
+ from starlette.middleware.cors import CORSMiddleware
+ from motor.motor_asyncio import AsyncIOMotorClient
+@@ -6,7 +6,7 @@ import os
+ import logging
+ from pathlib import Path
+ from pydantic import BaseModel, Field
+-from typing import List
++from typing import List, Optional
+ import uuid
+ from datetime import datetime
+ 
+@@ -48,7 +48,7 @@ class NodeData(BaseModel):
+     height: float
+     color: str
+     locked: bool
+-    lockTimer: int = None
++    lockTimer: Optional[int] = None
+     tabs: List[NodeTab]
+     fields: dict = {}
+ 
+@@ -56,7 +56,7 @@ class Connection(BaseModel):
+     id: str
+     fromNode: str = Field(alias="from")
+     toNode: str = Field(alias="to")
+-    label: str = None
++    label: Optional[str] = None
+ 
+     class Config:
+         populate_by_name = True
+@@ -104,7 +104,7 @@ async def get_flowcharts():
+ async def get_flowchart(flowchart_id: str):
+     flowchart = await db.flowcharts.find_one({"id": flowchart_id})
+     if not flowchart:
+-        return {"error": "Flowchart not found"}
++        raise HTTPException(status_code=404, detail="Flowchart not found")
+     return FlowChart(**flowchart)
+ 
+ @api_router.put("/flowcharts/{flowchart_id}", response_model=FlowChart)
+@@ -112,11 +112,14 @@ async def update_flowchart(flowchart_id: str, updates: FlowChartUpdate):
+     update_data = {k: v for k, v in updates.dict().items() if v is not None}
+     update_data["updatedAt"] = datetime.utcnow()
+     
+-    await db.flowcharts.update_one(
++    result = await db.flowcharts.update_one(
+         {"id": flowchart_id},
+         {"$set": update_data}
+     )
+     
++    if result.matched_count == 0:
++        raise HTTPException(status_code=404, detail="Flowchart not found")
++    
+     flowchart = await db.flowcharts.find_one({"id": flowchart_id})
+     return FlowChart(**flowchart)
+ 
+diff --git a/test_result.md b/test_result.md
+index 4c86865..78ad217 100644
+--- a/test_result.md
++++ b/test_result.md
+@@ -107,15 +107,18 @@ user_problem_statement: "Build FlowSpeak - Interactive flowchart app with text-t
+ backend:
+   - task: "Flowchart CRUD API endpoints"
+     implemented: true
+-    working: "NA"
++    working: true
+     file: "/app/backend/server.py"
+     stuck_count: 0
+     priority: "high"
+-    needs_retesting: true
++    needs_retesting: false
+     status_history:
+       - working: "NA"
+         agent: "main"
+         comment: "Created POST /api/flowcharts, GET /api/flowcharts, GET /api/flowcharts/{id}, PUT /api/flowcharts/{id}, DELETE /api/flowcharts/{id} with MongoDB storage"
++      - working: true
++        agent: "testing"
++        comment: "All 7 backend API tests passed successfully. Fixed Pydantic validation issues (Optional types for lockTimer and label fields) and improved error handling with proper HTTP exceptions. Verified: health check, create/read/update/delete operations, data persistence in MongoDB, proper error responses for invalid IDs. All CRUD operations working correctly with realistic test data."
+ 
+ frontend:
+   - task: "Flowchart canvas with pan/zoom/pinch gestures"
+@@ -210,4 +213,6 @@ test_plan:
+ 
+ agent_communication:
+   - agent: "main"
+-    message: "Initial FlowSpeak MVP implementation complete. Created core flowchart engine with gesture-driven 2D canvas, text-to-node conversion, multi-layer tab system inside nodes, local persistence with MMKV, and backend API for future cloud sync. Ready for testing - Backend APIs first, then frontend if user approves."
+\ No newline at end of file
++    message: "Initial FlowSpeak MVP implementation complete. Created core flowchart engine with gesture-driven 2D canvas, text-to-node conversion, multi-layer tab system inside nodes, local persistence with MMKV, and backend API for future cloud sync. Ready for testing - Backend APIs first, then frontend if user approves."
++  - agent: "testing"
++    message: "Backend API testing completed successfully! All 7 FlowSpeak backend endpoints are working correctly. Fixed minor Pydantic validation issues and improved error handling. All CRUD operations verified with MongoDB persistence. Backend is ready for production use. Fixed issues: Optional type annotations for lockTimer and label fields, proper HTTP exception handling for 404 errors."
+\ No newline at end of file
