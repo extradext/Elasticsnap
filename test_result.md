@@ -107,15 +107,18 @@ user_problem_statement: "Build FlowSpeak - Interactive flowchart app with text-t
 backend:
   - task: "Flowchart CRUD API endpoints"
     implemented: true
-    working: "NA"
+    working: true
     file: "/app/backend/server.py"
     stuck_count: 0
     priority: "high"
-    needs_retesting: true
+    needs_retesting: false
     status_history:
       - working: "NA"
         agent: "main"
         comment: "Created POST /api/flowcharts, GET /api/flowcharts, GET /api/flowcharts/{id}, PUT /api/flowcharts/{id}, DELETE /api/flowcharts/{id} with MongoDB storage"
+      - working: true
+        agent: "testing"
+        comment: "All 7 backend API tests passed successfully. Fixed Pydantic validation issues (Optional types for lockTimer and label fields) and improved error handling with proper HTTP exceptions. Verified: health check, create/read/update/delete operations, data persistence in MongoDB, proper error responses for invalid IDs. All CRUD operations working correctly with realistic test data."
 
 frontend:
   - task: "Flowchart canvas with pan/zoom/pinch gestures"
