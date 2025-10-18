@@ -202,6 +202,13 @@ export default function FlowCanvasV2() {
           ))}
         </Animated.View>
       </GestureDetector>
+
+      <CreateChildModal
+        visible={createChildModalVisible}
+        parentId={parentIdForChild}
+        onClose={() => setCreateChildModalVisible(false)}
+        onSubmit={handleSubmitChild}
+      />
     </View>
   );
 }
