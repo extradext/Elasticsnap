@@ -10,6 +10,7 @@ import Animated, {
 import Svg, { Path, Defs, Marker, Circle } from 'react-native-svg';
 import { useFlowStore } from '../store/flowStore';
 import FlowNodeV2 from './FlowNodeV2';
+import CreateChildModal from './CreateChildModal';
 
 const { width: SCREEN_WIDTH, height: SCREEN_HEIGHT } = Dimensions.get('window');
 
