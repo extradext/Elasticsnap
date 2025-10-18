@@ -27,30 +27,103 @@ api_router = APIRouter(prefix="/api")
 
 
 # Define Models
-class StatusCheck(BaseModel):
-    id: str = Field(default_factory=lambda: str(uuid.uuid4()))
-    client_name: str
-    timestamp: datetime = Field(default_factory=datetime.utcnow)
+class TabContent(BaseModel):
+    id: str
+    type: str
+    content: str
+    subtabs: List['TabContent'] = []
 
-class StatusCheckCreate(BaseModel):
-    client_name: str
+class NodeTab(BaseModel):
+    id: str
+    label: str
+    content: List[TabContent]
+
+class NodeData(BaseModel):
+    id: str
+    type: str
+    label: str
+    x: float
+    y: float
+    width: float
+    height: float
+    color: str
+    locked: bool
+    lockTimer: int = None
+    tabs: List[NodeTab]
+    fields: dict = {}
+
+class Connection(BaseModel):
+    id: str
+    fromNode: str = Field(alias="from")
+    toNode: str = Field(alias="to")
+    label: str = None
+
+    class Config:
+        populate_by_name = True
+
+class FlowChart(BaseModel):
+    id: str = Field(default_factory=lambda: str(uuid.uuid4()))
+    userId: str = "local"
+    name: str = "Untitled Flow"
+    nodes: List[NodeData] = []
+    connections: List[Connection] = []
+    createdAt: datetime = Field(default_factory=datetime.utcnow)
+    updatedAt: datetime = Field(default_factory=datetime.utcnow)
+
+class FlowChartCreate(BaseModel):
+    name: str = "Untitled Flow"
+    nodes: List[NodeData] = []
+    connections: List[Connection] = []
+
+class FlowChartUpdate(BaseModel):
+    name: str = None
+    nodes: List[NodeData] = None
+    connections: List[Connection] = None
+
+# Update TabContent to support recursive subtabs
+TabContent.model_rebuild()
 
 # Add your routes to the router instead of directly to app
 @api_router.get("/")
 async def root():
-    return {"message": "Hello World"}
+    return {"message": "FlowSpeak API Ready"}
 
-@api_router.post("/status", response_model=StatusCheck)
-async def create_status_check(input: StatusCheckCreate):
-    status_dict = input.dict()
-    status_obj = StatusCheck(**status_dict)
-    _ = await db.status_checks.insert_one(status_obj.dict())
-    return status_obj
+# Flowchart endpoints
+@api_router.post("/flowcharts", response_model=FlowChart)
+async def create_flowchart(flowchart: FlowChartCreate):
+    flow_obj = FlowChart(**flowchart.dict())
+    await db.flowcharts.insert_one(flow_obj.dict())
+    return flow_obj
 
-@api_router.get("/status", response_model=List[StatusCheck])
-async def get_status_checks():
-    status_checks = await db.status_checks.find().to_list(1000)
-    return [StatusCheck(**status_check) for status_check in status_checks]
+@api_router.get("/flowcharts", response_model=List[FlowChart])
+async def get_flowcharts():
+    flowcharts = await db.flowcharts.find().to_list(100)
+    return [FlowChart(**fc) for fc in flowcharts]
+
+@api_router.get("/flowcharts/{flowchart_id}", response_model=FlowChart)
+async def get_flowchart(flowchart_id: str):
+    flowchart = await db.flowcharts.find_one({"id": flowchart_id})
+    if not flowchart:
+        return {"error": "Flowchart not found"}
+    return FlowChart(**flowchart)
+
+@api_router.put("/flowcharts/{flowchart_id}", response_model=FlowChart)
+async def update_flowchart(flowchart_id: str, updates: FlowChartUpdate):
+    update_data = {k: v for k, v in updates.dict().items() if v is not None}
+    update_data["updatedAt"] = datetime.utcnow()
+    
+    await db.flowcharts.update_one(
+        {"id": flowchart_id},
+        {"$set": update_data}
+    )
+    
+    flowchart = await db.flowcharts.find_one({"id": flowchart_id})
+    return FlowChart(**flowchart)
+
+@api_router.delete("/flowcharts/{flowchart_id}")
+async def delete_flowchart(flowchart_id: str):
+    result = await db.flowcharts.delete_one({"id": flowchart_id})
+    return {"deleted": result.deleted_count > 0}
 
 # Include the router in the main app
 app.include_router(api_router)
