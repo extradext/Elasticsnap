@@ -97,7 +97,7 @@ export default function Index() {
         </View>
 
         {/* Canvas */}
-        <FlowCanvas />
+        <FlowCanvasV2 />
 
         {/* Bottom Action Bar */}
         <View style={styles.bottomBar}>
