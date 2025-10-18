@@ -48,7 +48,7 @@ class NodeData(BaseModel):
     height: float
     color: str
     locked: bool
-    lockTimer: int = None
+    lockTimer: Optional[int] = None
     tabs: List[NodeTab]
     fields: dict = {}
 
