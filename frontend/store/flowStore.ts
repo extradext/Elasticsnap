@@ -106,7 +106,11 @@ export const useFlowStore = create<FlowState>((set, get) => ({
       id,
       tabs: [defaultTab],
       color: nodeData.color || defaultNodeColors[nodeData.type],
-      locked: false
+      locked: false,
+      isParent: true, // Nodes created via + button are parents
+      parentId: null,
+      velocityX: 0,
+      velocityY: 0
     };
     
     set((state) => {
@@ -120,6 +124,56 @@ export const useFlowStore = create<FlowState>((set, get) => ({
         historyIndex: newHistory.length - 1
       };
     });
+    get().saveToStorage();
+  },
+
+  addChildNode: (parentId, nodeData) => {
+    const parent = get().nodes.find(n => n.id === parentId);
+    if (!parent) return;
+    
+    const id = Date.now().toString();
+    const defaultTab: NodeTab = {
+      id: `tab-${id}-1`,
+      label: 'Main',
+      content: [{
+        id: `content-${id}-1`,
+        type: 'text',
+        content: nodeData.label
+      }]
+    };
+    
+    // Position child node relative to parent (slightly below and to the right)
+    const childX = parent.x + parent.width + 60;
+    const childY = parent.y + 40;
+    
+    const newNode: NodeData = {
+      ...nodeData,
+      id,
+      tabs: [defaultTab],
+      x: childX,
+      y: childY,
+      color: nodeData.color || defaultNodeColors[nodeData.type],
+      locked: false,
+      isParent: false,
+      parentId: parentId,
+      velocityX: 0,
+      velocityY: 0
+    };
+    
+    set((state) => {
+      const newNodes = [...state.nodes, newNode];
+      const newHistory = state.history.slice(0, state.historyIndex + 1);
+      newHistory.push({ nodes: newNodes, connections: state.connections });
+      
+      return {
+        nodes: newNodes,
+        history: newHistory,
+        historyIndex: newHistory.length - 1
+      };
+    });
+    
+    // Auto-connect parent to child
+    get().addConnection(parentId, id);
     get().saveToStorage();
   },
 
