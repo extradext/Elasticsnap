@@ -112,10 +112,13 @@ async def update_flowchart(flowchart_id: str, updates: FlowChartUpdate):
     update_data = {k: v for k, v in updates.dict().items() if v is not None}
     update_data["updatedAt"] = datetime.utcnow()
     
-    await db.flowcharts.update_one(
+    result = await db.flowcharts.update_one(
         {"id": flowchart_id},
         {"$set": update_data}
     )
+    
+    if result.matched_count == 0:
+        raise HTTPException(status_code=404, detail="Flowchart not found")
     
     flowchart = await db.flowcharts.find_one({"id": flowchart_id})
     return FlowChart(**flowchart)
