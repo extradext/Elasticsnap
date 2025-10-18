@@ -31,6 +31,10 @@ export interface NodeData {
   lockTimer?: number;
   tabs: NodeTab[];
   fields?: Record<string, any>;
+  parentId?: string | null; // For parent-child relationships
+  isParent?: boolean; // True if created via + button
+  velocityX?: number; // For physics simulation
+  velocityY?: number;
 }
 
 export interface Connection {
