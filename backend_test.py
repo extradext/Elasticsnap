@@ -10,7 +10,7 @@ import sys
 from datetime import datetime
 
 # Use the production URL from frontend/.env
-BASE_URL = "https://interactive-charts-2.preview.emergentagent.com/api"
+BASE_URL = "https://chartflow-4.preview.emergentagent.com/api"
 
 class FlowSpeakAPITester:
     def __init__(self):
