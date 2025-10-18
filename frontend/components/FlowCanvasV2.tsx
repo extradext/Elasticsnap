@@ -106,6 +106,19 @@ export default function FlowCanvasV2() {
     setCreateChildModalVisible(true);
   };
 
+  const handleSubmitChild = (parentId: string, label: string, type: 'task' | 'decision') => {
+    addChildNode(parentId, {
+      type,
+      label,
+      x: 0, // Will be calculated in store
+      y: 0,
+      width: 140,
+      height: 70,
+      color: '',
+      locked: false
+    });
+  };
+
   // Generate smooth bezier curve for connections (elastic effect)
   const generateConnectionPath = (x1: number, y1: number, x2: number, y2: number) => {
     const dx = x2 - x1;
