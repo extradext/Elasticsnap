@@ -124,7 +124,7 @@ frontend:
   - task: "Flowchart canvas with pan/zoom/pinch gestures"
     implemented: true
     working: "NA"
-    file: "/app/frontend/components/FlowCanvas.tsx"
+    file: "/app/frontend/components/FlowCanvasV2.tsx"
     stuck_count: 0
     priority: "high"
     needs_retesting: true
@@ -132,11 +132,14 @@ frontend:
       - working: "NA"
         agent: "main"
         comment: "Created FlowCanvas with GestureHandler for pan, pinch zoom, and tap gestures. SVG-based connection rendering"
+      - working: "NA"
+        agent: "main"
+        comment: "ENHANCED: Rebuilt canvas with spring physics using react-native-reanimated for organic motion. Added smooth bezier curves for elastic connections, improved gesture feedback, and created CreateChildModal for intuitive child node spawning."
   
   - task: "Node rendering with drag, connect, recolor"
     implemented: true
     working: "NA"
-    file: "/app/frontend/components/FlowNode.tsx"
+    file: "/app/frontend/components/FlowNodeV2.tsx"
     stuck_count: 0
     priority: "high"
     needs_retesting: true
@@ -144,6 +147,21 @@ frontend:
       - working: "NA"
         agent: "main"
         comment: "Created FlowNode with dragging, long-press to connect, double-tap to recolor, visual indicators for tabs and locks"
+      - working: "NA"
+        agent: "main"
+        comment: "ENHANCED: Completely rebuilt with fluid spring animations. Added: scale/rotation feedback on touch, wiggle effect on drag, bounce on tap, smooth position transitions. Nodes now feel alive with organic motion at every interaction. Quick-create child button appears when selected."
+  
+  - task: "Parent-child node hierarchy with hybrid creation"
+    implemented: true
+    working: "NA"
+    file: "/app/frontend/store/flowStore.ts, /app/frontend/components/CreateChildModal.tsx"
+    stuck_count: 0
+    priority: "high"
+    needs_retesting: true
+    status_history:
+      - working: "NA"
+        agent: "main"
+        comment: "NEW FEATURE: Implemented hybrid node creation model. + button creates independent parent nodes (new starting points). Tapping existing nodes opens modal to create contextually connected child nodes. Parent-child relationships tracked with parentId field. Auto-connection and smart positioning for natural growth feeling."
   
   - task: "Text-to-node conversion (single and multiple)"
     implemented: true
