@@ -9,7 +9,7 @@ import {
 } from 'react-native';
 import { GestureHandlerRootView } from 'react-native-gesture-handler';
 import { MaterialIcons } from '@expo/vector-icons';
-import FlowCanvas from '../components/FlowCanvas';
+import FlowCanvasV2 from '../components/FlowCanvasV2';
 import TextInputModal from '../components/TextInputModal';
 import NodeDetailSheet from '../components/NodeDetailSheet';
 import { useFlowStore } from '../store/flowStore';
