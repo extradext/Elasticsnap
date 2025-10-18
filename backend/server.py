@@ -56,7 +56,7 @@ class Connection(BaseModel):
     id: str
     fromNode: str = Field(alias="from")
     toNode: str = Field(alias="to")
-    label: str = None
+    label: Optional[str] = None
 
     class Config:
         populate_by_name = True
