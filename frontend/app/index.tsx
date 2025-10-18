@@ -158,8 +158,9 @@ export default function Index() {
             <MaterialIcons name="touch-app" size={48} color="#444" />
             <Text style={styles.emptyStateTitle}>Start Creating</Text>
             <Text style={styles.emptyStateText}>
-              Tap the + button to create a single node{"\n"}
-              or tap the text icon to create from text
+              Tap the + button to create a parent node{"\n"}
+              Then tap any node to spawn connected children{"\n"}
+              Long-press to connect, double-tap to recolor
             </Text>
           </View>
         )}
