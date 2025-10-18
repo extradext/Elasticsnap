@@ -104,7 +104,7 @@ async def get_flowcharts():
 async def get_flowchart(flowchart_id: str):
     flowchart = await db.flowcharts.find_one({"id": flowchart_id})
     if not flowchart:
-        return {"error": "Flowchart not found"}
+        raise HTTPException(status_code=404, detail="Flowchart not found")
     return FlowChart(**flowchart)
 
 @api_router.put("/flowcharts/{flowchart_id}", response_model=FlowChart)
